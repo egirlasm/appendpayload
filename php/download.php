@@ -7,7 +7,7 @@ const  PAYLOAD_ALIGNMENT = 8;
 
 $handle = fopen("zerom-client.exe","rb");
 
-
+$payload = "nimabasldkf";
 
 
 if (!$handle) return FALSE;
@@ -49,10 +49,20 @@ while (!feof($handle)) {
 }
 
 fseek($newfile,0,SEE_END);
-fputs($newfile,"caonimab");
+$payload_size = strlen($payload);
+$padding_size = PAYLOAD_ALIGNMENT - ($payload_size % PAYLOAD_ALIGNMENT);
+var_dump("padding_size".$padding_size);
+
+	if ($padding_size > 0)
+	{
+		for ($i=0; $i<$padding_size; ++$i)
+			fputs($newfile,pack("h",0));
+	}
+
+fputs($newfile,$payload);
 
 fseek($newfile, $cert_table_length_offset+4, SEEK_SET);
-$fixedSize = $cert_table_length+8;
+$fixedSize = $cert_table_length+$payload_size+$padding_size;
 var_dump(dechex($fixedSize));
 $hexdata = pack('V',$fixedSize);
 var_dump($hexdata);
